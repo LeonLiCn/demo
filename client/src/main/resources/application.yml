@@ -1,0 +1,57 @@
+server:
+  port: 8001
+
+eureka:
+  instance:
+    hostname: client
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    #
+    service-url:
+      defaultZone: http://localhost:8000/eureka
+
+spring:
+  application:
+    name: client
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      url: jdbc:mysql://localhost:3306/skill_test?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: root
+      # 配置MySQL的驱动程序类
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # 初始化大小，最小，最大连接数
+      initial-size: 10
+      max-active: 30
+      min-idle: 5
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 5000ms
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 10
+        max-wait: 10000ms
+        min-idle: 5
+      # 关闭超时时间
+      shutdown-timeout: 1000ms
+
+
+mybatis:
+  mapper-locations: classpath*:/mapper/**.xml
+  type-aliases-package: com.example.client.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false

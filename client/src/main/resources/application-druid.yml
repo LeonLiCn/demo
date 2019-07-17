@@ -1,0 +1,28 @@
+spring:
+    aop:
+        proxy-target-class: true
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        druid:
+            # 配置MySQL的驱动程序类
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            # 数据库用户名
+            username: root
+            # 初始化大小，最小，最大连接数
+            initial-size: 10
+            max-active: 30
+            min-idle: 5
+            # 配置获取连接等待超时的时间
+            max-wait: 60000
+            # 解决mysql8小时的问题
+            validation-query: select 'x'
+            validationQueryTimeout: 5
+            test-on-borrow: false
+            test-on-return: false
+            test-while-idle: true
+            # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+            time-between-eviction-runs-millis: 60000
+            # 配置一个连接在池中最小生存的时间，单位是毫秒
+            min-evictable-idle-time-millis: 300000
+
+
