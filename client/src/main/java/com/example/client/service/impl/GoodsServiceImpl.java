@@ -48,8 +48,8 @@ public class GoodsServiceImpl implements GoodsService {
      * 1. database 添加data_version 数据处理异常，响应时间7S
      * 2. synchronized 锁定方法 耗时8S 数据处理成功
      * 3. lock锁定所有代码片段 耗时7S 数据处理成功
-     * 4. 多线程处理 lock锁定所有代码段 耗时4S 数据处理成功
-     * 5. redis原子自增处理 耗时5S 数据处理成功
+     * 4. 多线程处理 lock锁定所有代码段 耗时4S 数据处理成功 12线程938/S 吞吐量
+     * 5. redis原子自增处理 耗时5S 数据处理成功 12线程928/S 吞吐量
      *
      */
 
@@ -105,7 +105,7 @@ public class GoodsServiceImpl implements GoodsService {
 
         @Override
         public void run() {
-            redisBuyGoods(id, username);
+            buyGoods(id, username);
         }
     }
 
@@ -130,6 +130,9 @@ public class GoodsServiceImpl implements GoodsService {
 
         //减少库存
         Long count = stringRedisTemplate.opsForValue().decrement(key);
+        if (count == 0) {
+            log.info("+++++++++++++++++++++++++++++++++++");
+        }
         //库存充足
         if (count >= 0) {
             log.info("success");
@@ -139,8 +142,9 @@ public class GoodsServiceImpl implements GoodsService {
             }
         } else {
             //库存不足，需要增加刚刚减去的库存
-            incr(key);
+
         }
+        log.info("goods no have more!");
         return "goods no have more!";
     }
 
@@ -174,29 +178,5 @@ public class GoodsServiceImpl implements GoodsService {
         return 1;
     }
 
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    private Long decr(String key) {
-        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, stringRedisTemplate.getConnectionFactory());
-        Long count = entityIdCounter.getAndDecrement();
-        RedisAtomicInteger redisAtomicInteger = new RedisAtomicInteger(key, stringRedisTemplate.getConnectionFactory());
-        Integer a = redisAtomicInteger.getAndDecrement();
-        return count;
-    }
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    private Long incr(String key) {
-        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, stringRedisTemplate.getConnectionFactory());
-        Long count = entityIdCounter.getAndIncrement();
-        return count;
-    }
 
 }
